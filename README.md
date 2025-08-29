@@ -24,7 +24,7 @@ Showing in the reverse order.
 s -r 
 ```
 --------
-shows basic information about a file.
+Shows basic information about a file.
 + size
 + creation date
 + name

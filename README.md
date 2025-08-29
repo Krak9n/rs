@@ -13,16 +13,17 @@ cargo install --path .
 ```
 
 ### Usage:
+-------
 Basic file showing.
 ```
 s
 ```
-
+--------
 Showing in the reverse order.
 ```
 s -r 
 ```
-
+--------
 shows basic information about a file.
 + size
 + creation date

@@ -1,40 +1,29 @@
-use std::{env, fs};
 use walkdir::WalkDir;
-use std::fs::ReadDir;
-use std::time::SystemTime;
-use std::io;
-use std::error::Error;
-use clap::Parser;
+use std::{ env, fs, process::Command, time::SystemTime, fs::read_dir, error::Error, io };
 use colored::Colorize;
 use sysinfo::System;
 use terminal_size::{Width, Height, terminal_size};
+use filetime::FileTime;
 
-#[derive(Parser)]
-struct Args {
-  r: String,
-  i: String,
-  // only if directory is given
-  d: String,
-}
+mod args;
 
-enum files { 
-  
+enum smt{
 }
 
 fn main() {
   // takes current path as the
   // one to list
-  
+  args::asserting();
+  // let input = Args::parse();
   let access = RS::new();
-  RS::printing(access.files);
-  RS::creation_date();  
+  RS::make_better(access.files);
 }
 
 fn colors() {
 }
 
 struct RS {
-  files: ReadDir,
+  files: String,
   width: u16,
   reverse: bool,
   filesize: String,
@@ -47,10 +36,13 @@ impl RS {
     let size = terminal_size();
     let Some((Width(w), Height(h))) = size else { todo!()};
 
+    let mut sys = System::new_all();
+    sys.refresh_all();
+    
     let metadata = fs::metadata("./").unwrap();
     
     Self {
-      files: fs::read_dir("./").unwrap(),
+      files: "./".to_string(),
       width: w,
       reverse: false,
       filesize: metadata.len().to_string(),
@@ -59,23 +51,34 @@ impl RS {
     }
   }
 
-  pub fn printing(path: ReadDir) {
-    for path in path {
-      println!("{}", 
-        format!("{} ", path.unwrap().path().display()));
+  pub fn make_better(path: String) {
+    println!("--{}", 
+      format!("{:?} {:?}", Self::printing(path.clone()), Self::creation_date(path.clone())));
+  }
+ 
+  fn printing(path: String) -> Result<(), Box<dyn std::error::Error>> {
+    for entry in fs::read_dir(path)? {
+      let path = entry?.path();
+      println!("{}", path.display());
     }
+    Ok(())
   }
 
-  pub fn creation_date() -> Result<(), Box<dyn std::error::Error>> {
+  fn creation_date(path: String) -> std::io::Result<()> {
     let pop = RS::new();
-   
-    let path: String = pop.files;
-    for entry in fs::read_dir(path)? {
-      if let Ok(time) = pop.date {
-        println!("{time:?}");
-      } else {
-        println!("not supported on this platform or filesystem");
-      }
+
+    for entry in fs::read_dir(&path)? {
+      let pathy = entry?.path();
+      let path_str = pathy.to_str().unwrap();
+
+      let mut value = Command::new("sh")
+        .arg("-c")
+        .arg("stat -c '%w' ")
+        .arg(pathy)
+        .output()
+        .expect("failed to execute process");
+      
+      println!("");
     }
     Ok(())
   }

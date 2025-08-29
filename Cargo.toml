@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 clap = { version = "4.5.46", features = ["derive"] }
 colored = "3.0.0"
+filetime = "0.2.26"
 sysinfo = "0.37.0"
 terminal_size = "0.4.3"
 walkdir = "2.5.0"

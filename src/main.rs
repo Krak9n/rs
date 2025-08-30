@@ -1,25 +1,38 @@
 use walkdir::WalkDir;
-use std::{ env, fs, process::Command, time::SystemTime, fs::read_dir, error::Error, io };
+use std::{ 
+  env, fs, io, 
+  process::Command, time::SystemTime, fs::read_dir, 
+  error::Error, path::PathBuf };
 use colored::Colorize;
 use sysinfo::System;
 use terminal_size::{Width, Height, terminal_size};
 use filetime::FileTime;
+use clap::{ Arg, Parser, parser::ValueSource };
 
-mod args;
+#[derive(Parser)]
+struct Args {
+  #[clap(short, default_value_t = true)]
+  r: bool,
+  #[clap(short, default_value_t = true)]
+  i: bool,
+  #[clap(short, default_value_t = true)]
+  d: bool,
+}
 
 enum smt{
 }
 
 fn main() {
-  // takes current path as the
-  // one to list
-  args::asserting();
-  // let input = Args::parse();
   let access = RS::new();
-  RS::make_better(access.files);
-}
 
-fn colors() {
+  let k: bool = false;
+  let a: bool = true;
+
+  if access.width <= 39 { 
+    RS::make_better(access.files, k, access.filesize);
+  } else {
+    RS::make_it_suck(access.files, a, access.filesize);
+  }
 }
 
 struct RS {
@@ -38,48 +51,115 @@ impl RS {
 
     let mut sys = System::new_all();
     sys.refresh_all();
-    
+   
+    let args1 = Args::parse();
+    // doesnt work as intended
     let metadata = fs::metadata("./").unwrap();
-    
+    let args: Vec<String> = env::args()
+      .collect();
+
     Self {
-      files: "./".to_string(),
+      files: {
+        if args1.d == false {
+          let path = args[2].to_string();
+          path
+        } else {
+          let path = "./".to_string();
+          path
+        }
+      },
       width: w,
       reverse: false,
-      filesize: metadata.len().to_string(),
+      filesize: "".to_string(),
       date: metadata.created(),
       os: System::name(),
     }
   }
 
-  pub fn make_better(path: String) {
-    println!("--{}", 
-      format!("{:?} {:?}", Self::printing(path.clone()), Self::creation_date(path.clone())));
+  // make the colors function apper
+  // during foor loop, and/or if it equals 
+  // to dir make the color fucking red 
+  // and file to be idk green
+  fn filesize(path: String, size: String) -> Result<(), Box<dyn std::error::Error>> {
+    for entry in fs::read_dir(path)? {
+      let path2 = entry?.path();
+      let path_str = path2.to_str().unwrap();
+ 
+      let metada = fs::metadata(path_str).unwrap();
+      print!("{} ", metada.len());
+    }
+    Ok(())
+  }
+  
+  // large width
+  pub fn make_it_suck(path: String, fuck: bool, s: String) {
+    Self::printing(path.clone(), fuck);
+    /*print!("{}", 
+      format!("{:?} {:?}", Self::filesize(path.clone(), s), Self::printing(path.clone(), fuck))
+      );*/ 
+    //Self::creation_date(path.clone());
+    println!();
+  }
+
+  fn coloring(color: &str, text: &str, ind: &str, k: bool) {
+    if k == true { 
+      print!("{} {}", text.color(color), ind);
+    } else {
+      println!("{} {}", text.color(color), ind);
+    } 
+  }
+
+  // small terminal width
+  pub fn make_better(path: String, fuukc: bool, s: String) {
+    Self::printing(path.clone(), fuukc);
+    /*print!("{}", 
+      format!("{:?} {:?}", Self::filesize(path.clone(), s), Self::printing(path.clone(), fuukc))
+      );*/
+    //Self::creation_date(path.clone());
+    //println!();
   }
  
-  fn printing(path: String) -> Result<(), Box<dyn std::error::Error>> {
+  fn printing(path: String, of: bool) -> Result<(), Box<dyn std::error::Error>> {
     for entry in fs::read_dir(path)? {
-      let path = entry?.path();
-      println!("{}", path.display());
+      let path2 = entry?.path();
+      let path_str = path2.to_str().unwrap();
+
+      let pb = PathBuf::from(path2.clone());
+      let is_file = path2.is_file();
+     
+      // finish alphabetical stuff later
+      /*
+      let mut vec = Vec::new();
+      vec.push(path_str);
+      vec.sort_by_key(|name| name.to_lowercase());
+      println!("{vec:?}");
+      */
+
+      if is_file == true { 
+        Self::coloring("red", &path2.display().to_string(), ""/*"--is file"*/, of);
+      } 
+
+      if is_file == false {
+        Self::coloring("yellow", &path2.display().to_string(), ""/*"--is dir"*/, of);
+      }
     }
     Ok(())
   }
 
+  fn show_from_input() {
+
+  }
+
   fn creation_date(path: String) -> std::io::Result<()> {
-    let pop = RS::new();
-
-    for entry in fs::read_dir(&path)? {
-      let pathy = entry?.path();
-      let path_str = pathy.to_str().unwrap();
-
-      let mut value = Command::new("sh")
-        .arg("-c")
-        .arg("stat -c '%w' ")
-        .arg(pathy)
-        .output()
-        .expect("failed to execute process");
+    for entry in fs::read_dir(path)? {
+      let path2 = entry?.path();
+      let path_str = path2.to_str().unwrap();
       
-      println!("");
+      let metadata = fs::metadata(&path_str)?;
+      let created = metadata.created()?;
+      //println!("{} was created on {:?}", path_str, created);
     }
+
     Ok(())
   }
 }

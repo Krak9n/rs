@@ -1,11 +1,13 @@
 This is my analogue to **ls** command from gnu coreutils. Shows basic information.
 
-> [!Read]
+> [!WARNING]
 > This thing is made for myself. However, 
 if you have any problems feel free to change and/or open pull requests.
 
 <!--Works on both windows and linux.-->
-**s** stands for **show**.
+To say that, <br />
+**s** stands for **show**, <br />
+and **r** was just for for smth. <br />
 
 ### Dependencies
 + cargo
@@ -18,21 +20,27 @@ After cloning just, run this command
 
 ### Usage:
 -------
-Basic file showing.
+Basic information:
++ name
 ```
 rs
 ```
 --------
+Path:
+```
+rs -d ~
+```
+--------
+Some properties: 
++ name
++ size
+```
+rs -i
+```
+<!--
+---------
 Showing in the reverse order.
 ```
 rs -r 
-```
---------
-Shows basic information about a file.
-+ size
-+ last modified date for a file
-+ name
-```
-rs -i
-``` 
+```-->
 

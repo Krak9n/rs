@@ -20,9 +20,11 @@ After cloning just, run this command
 -------
 Shows all needed information about files in the current directory:
 + name
-+ creation date
 + size
++ creation date
 ```
 rs
 ```
 --------
+
+**Good luck!**

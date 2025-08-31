@@ -13,7 +13,7 @@ To say that, **s** stands for **show**, and **r** was just for for something. <b
 ### Installation
 After cloning just, run this command
 ```
-# cargo install --path .
+$ cargo install --path .
 ```
 
 ### Usage:

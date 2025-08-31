@@ -5,9 +5,7 @@ This is my analogue to **ls** command from gnu coreutils. Shows basic informatio
 if you have any problems feel free to change and/or open pull requests.
 
 <!--Works on both windows and linux.-->
-To say that, <br />
-**s** stands for **show**, <br />
-and **r** was just for for smth. <br />
+To say that, **s** stands for **show**, and **r** was just for for something. <br />
 
 ### Dependencies
 + cargo
@@ -20,27 +18,11 @@ After cloning just, run this command
 
 ### Usage:
 -------
-Basic information:
+Shows all needed information about files in the current directory:
 + name
++ creation date
++ size
 ```
 rs
 ```
 --------
-Path:
-```
-rs -d ~
-```
---------
-Some properties: 
-+ name
-+ size
-```
-rs -i
-```
-<!--
----------
-Showing in the reverse order.
-```
-rs -r 
-```-->
-
